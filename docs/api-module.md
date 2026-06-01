@@ -4,7 +4,7 @@ All HTTP endpoints follow REST conventions. Error responses use [RFC 7807 Proble
 
 ## Base URL
 
-```
+```text
 http://localhost:8080
 ```
 
@@ -166,7 +166,7 @@ Constraints: `fen` must not be blank; `depth` must be between 1 and 30.
 
 ### Connecting
 
-```
+```text
 ws://localhost:8080/ws
 ```
 
@@ -174,7 +174,7 @@ Uses SockJS with STOMP framing. The endpoint falls back to long-polling when Web
 
 ### Subscribing to Results
 
-```
+```text
 /topic/analysis
 ```
 
@@ -218,7 +218,7 @@ client.activate();
 ## DTOs
 
 | DTO | Direction | Fields |
-|---|---|---|
+| --- | --- | --- |
 | `CreateGameRequest` | Request | _(empty)_ |
 | `CreateGameResponse` | Response | `gameId, fen, turn, status, createdAt` |
 | `MakeMoveRequest` | Request | `move` (UCI, validated) |

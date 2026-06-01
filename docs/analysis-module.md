@@ -13,7 +13,7 @@ The analysis module orchestrates position evaluation by bridging the HTTP/WebSoc
 Represents the evaluation of a single candidate move.
 
 | Field | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `move` | `String` | Candidate move in UCI notation |
 | `score` | `int` | Centipawn score |
 | `isMate` | `boolean` | Whether this leads to forced mate |
@@ -27,7 +27,7 @@ Represents the evaluation of a single candidate move.
 Aggregates the full engine response for a position.
 
 | Field | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `fen` | `String` | Analysed position |
 | `bestMove` | `String` | Best move in UCI notation |
 | `score` | `int` | Centipawn evaluation |
@@ -68,7 +68,7 @@ When `depth == 0`, the implementation uses `StockfishProperties.getDefaultDepth(
 
 ### Depth Resolution
 
-```
+```text
 requested depth = 0  →  use StockfishProperties.defaultDepth (default: 12)
 requested depth > 0  →  use requested depth (max enforced by @Max(30) in DTO)
 ```

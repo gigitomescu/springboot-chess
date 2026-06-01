@@ -8,7 +8,6 @@ import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
-import com.github.bhlangonijr.chesslib.move.MoveList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,7 @@ public class ChessLibBoardService implements BoardService {
         Board board = loadBoard(fen);
         com.github.bhlangonijr.chesslib.move.Move move = parseMove(board, uciMove);
         try {
-            MoveList legal = MoveGenerator.generateLegalMoves(board);
+            var legal = MoveGenerator.generateLegalMoves(board);
             return legal.contains(move);
         } catch (MoveGeneratorException e) {
             log.warn("MoveGenerator error for FEN '{}': {}", fen, e.getMessage());

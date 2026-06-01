@@ -14,7 +14,7 @@
 
 The application follows **Clean Architecture** with strict layer separation:
 
-```
+```text
 ┌──────────────────────────────────────────────────────┐
 │                  Presentation Layer                   │
 │     Angular Client (port 4200)  /  React (port 3000) │

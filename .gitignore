@@ -24,6 +24,9 @@ Thumbs.db
 *.log
 logs/
 
+# ── Compiled class files ───────────────────────────────
+*.class
+
 # ── Spring Boot packaged jars ──────────────────────────
 *.jar
 *.war
