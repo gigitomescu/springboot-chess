@@ -1,0 +1,95 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #0f3460;
+  border-bottom: 2px solid #c9b37f;
+}
+
+.app-header h1 {
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.game-area {
+  display: flex;
+  gap: 32px;
+  padding: 32px;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+}
+
+.board-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-bar {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 16px;
+  background: #16213e;
+  border-radius: 4px;
+  color: #c9b37f;
+}
+
+.status-bar.game-over {
+  background: #3a1e2e;
+  color: #ff6b6b;
+}
+
+.error-banner {
+  background: #3a1e1e;
+  color: #ff6b6b;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid #ff6b6b;
+}
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 260px;
+}
+
+.move-history {
+  background: #16213e;
+  border: 1px solid #2d2d4e;
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.move-history h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.move-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  list-style: none;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.move-number {
+  opacity: 0.5;
+  margin-right: 2px;
+}

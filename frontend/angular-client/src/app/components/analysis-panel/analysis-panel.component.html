@@ -1,0 +1,39 @@
+<div class="analysis-panel">
+  <h3>Engine Analysis</h3>
+
+  <div class="controls">
+    <label>
+      Depth
+      <input type="number" [(ngModel)]="depth" min="1" max="30" />
+    </label>
+    <button class="primary" (click)="analyze()" [disabled]="loading || !fen">
+      {{ loading ? 'Analysing…' : 'Analyse' }}
+    </button>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="result" class="result">
+    <div class="score-row">
+      <span class="label">Evaluation</span>
+      <span class="score" [class.positive]="result.score > 0" [class.negative]="result.score < 0">
+        {{ formattedScore }}
+      </span>
+    </div>
+
+    <div class="best-move-row">
+      <span class="label">Best Move</span>
+      <span class="best-move">{{ result.bestMove }}</span>
+    </div>
+
+    <div class="depth-row">
+      <span class="label">Depth</span>
+      <span>{{ result.depth }}</span>
+    </div>
+
+    <div *ngIf="result.topMoves.length > 0" class="pv-section">
+      <span class="label">Principal Variation</span>
+      <p class="pv-line">{{ result.topMoves[0].line.join(' ') }}</p>
+    </div>
+  </div>
+</div>

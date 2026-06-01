@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: chess-app
+  web:
+    resources:
+      add-mappings: true
+
+# Stockfish engine configuration
+stockfish:
+  path: C:/stockfish/stockfish.exe
+  default-depth: 12
+  timeout-seconds: 10
+
+# Active frontend: angular | react | none
+frontend:
+  active: angular
+  cors:
+    allowed-origins: http://localhost:4200,http://localhost:3000
+
+logging:
+  level:
+    com.example.chess: DEBUG
+    root: INFO

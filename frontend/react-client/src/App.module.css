@@ -1,0 +1,113 @@
+.appShell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #0f3460;
+  border-bottom: 2px solid #c9b37f;
+}
+
+.header h1 {
+  font-size: 24px;
+  letter-spacing: 2px;
+  color: #e0e0e0;
+}
+
+.primary {
+  padding: 8px 20px;
+  background: #c9b37f;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gameArea {
+  display: flex;
+  gap: 32px;
+  padding: 32px;
+  justify-content: center;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.boardSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statusBar {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 16px;
+  background: #16213e;
+  border-radius: 4px;
+  color: #c9b37f;
+}
+
+.gameOver {
+  background: #3a1e2e;
+  color: #ff6b6b;
+}
+
+.errorBanner {
+  background: #3a1e1e;
+  color: #ff6b6b;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid #ff6b6b;
+}
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 260px;
+}
+
+.moveHistory {
+  background: #16213e;
+  border: 1px solid #2d2d4e;
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.moveHistory h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  color: #e0e0e0;
+}
+
+.moveList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  list-style: none;
+  font-family: monospace;
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
+.moveNum {
+  opacity: 0.5;
+  margin-right: 2px;
+}

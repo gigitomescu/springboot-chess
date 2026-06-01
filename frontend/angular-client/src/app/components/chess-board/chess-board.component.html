@@ -1,0 +1,30 @@
+<div class="board-container">
+  <div class="chess-board">
+    <ng-container *ngFor="let rank of ranks; let rankIdx = index">
+      <div
+        *ngFor="let file of files; let fileIdx = index"
+        class="square"
+        [class.light]="isLight(rankIdx, fileIdx)"
+        [class.dark]="!isLight(rankIdx, fileIdx)"
+        [class.selected]="isSelected(rankIdx, fileIdx)"
+        (click)="onSquareClick(rankIdx, fileIdx)"
+        [attr.data-square]="squareName(rankIdx, fileIdx)"
+      >
+        <!-- Rank label on the left edge -->
+        <span *ngIf="fileIdx === 0" class="rank-label">{{ rank }}</span>
+        <!-- File label on the bottom edge -->
+        <span *ngIf="rankIdx === 7" class="file-label">{{ file }}</span>
+
+        <!-- Chess piece -->
+        <span
+          *ngIf="getPiece(rankIdx, fileIdx) as piece"
+          class="piece"
+          [class.white-piece]="piece === piece.toUpperCase()"
+          [class.black-piece]="piece !== piece.toUpperCase()"
+        >
+          {{ pieceSymbols[piece] }}
+        </span>
+      </div>
+    </ng-container>
+  </div>
+</div>

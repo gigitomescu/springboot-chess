@@ -1,0 +1,46 @@
+/* Global reset and chess app theme */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  color: #c9b37f;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+button.primary {
+  background: #c9b37f;
+  color: #1a1a2e;
+  font-weight: bold;
+}
+
+button.primary:hover {
+  background: #e0c87a;
+}
+
+button.secondary {
+  background: #2d2d4e;
+  color: #e0e0e0;
+  border: 1px solid #4a4a7a;
+}
+
+button.secondary:hover {
+  background: #3a3a5e;
+}

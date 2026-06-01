@@ -1,0 +1,57 @@
+.boardContainer {
+  display: inline-block;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 72px);
+  grid-template-rows: repeat(8, 72px);
+  border: 2px solid #c9b37f;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.light { background: #f0d9b5; }
+.dark  { background: #b58863; }
+
+.selected {
+  outline: 3px solid #f6f669;
+  outline-offset: -3px;
+}
+
+.piece {
+  font-size: 44px;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  cursor: pointer;
+}
+
+.whitePiece { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+.blackPiece { color: #1a1a1a; }
+
+.rankLabel {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  opacity: 0.7;
+}
+
+.fileLabel {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  opacity: 0.7;
+}
