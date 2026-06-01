@@ -23,6 +23,19 @@ public interface ChessEngine {
     EngineResponse analyze(String fen, int depth);
 
     /**
+     * Returns the best move for the given position at the configured Skill Level.
+     * Uses a short fixed move-time (500 ms) for interactive play rather than
+     * a fixed depth, so the engine feels responsive.
+     *
+     * @param fen FEN string of the position
+     * @return UCI move string (e.g. {@code "e2e4"}) or {@code "(none)"} if
+     *         the position has no legal moves
+     * @throws com.gdt.chess.common.exception.EngineException if the engine is
+     *         unavailable or returns an unexpected response
+     */
+    String getBestMove(String fen);
+
+    /**
      * Returns {@code true} when the underlying engine process is running and
      * ready to accept commands.
      */

@@ -28,7 +28,9 @@ public class GameMapper {
                 game.getCurrentBoardState().getFen(),
                 game.getCurrentBoardState().getCurrentTurn().name(),
                 game.getStatus().name(),
-                game.getCreatedAt().toString()
+                game.getCreatedAt().toString(),
+                game.isVsEngine(),
+                game.getPlayerColor()
         );
     }
 
@@ -44,7 +46,9 @@ public class GameMapper {
                 game.getStatus().name(),
                 moves,
                 game.getMoveCount(),
-                game.getCreatedAt().toString()
+                game.getCreatedAt().toString(),
+                game.isVsEngine(),
+                game.getPlayerColor()
         );
     }
 
@@ -55,7 +59,8 @@ public class GameMapper {
                 game.getCurrentBoardState().getFen(),
                 game.getCurrentBoardState().getCurrentTurn().name(),
                 game.getStatus().name(),
-                game.isGameOver()
+                game.isGameOver(),
+                game.getLastEngineMove()
         );
     }
 

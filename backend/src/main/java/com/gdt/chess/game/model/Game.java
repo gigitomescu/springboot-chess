@@ -23,16 +23,31 @@ public final class Game {
     private final Instant createdAt;
     private final List<Move> moveHistory;
 
+    /** {@code true} when this game is played against the Stockfish engine. */
+    private final boolean vsEngine;
+
+    /** The human player's colour in a vs-engine game; {@code null} otherwise. */
+    private final String playerColor;
+
     private volatile BoardState currentBoardState;
     private volatile GameStatus status;
 
+    /** The last move made by the engine (set after each engine reply; {@code null} otherwise). */
+    private volatile String lastEngineMove;
+
     public Game(String id) {
+        this(id, false, null);
+    }
+
+    public Game(String id, boolean vsEngine, String playerColor) {
         Objects.requireNonNull(id, "Game ID cannot be null");
         this.id                 = id;
         this.createdAt          = Instant.now();
         this.moveHistory        = new ArrayList<>();
         this.currentBoardState  = BoardState.initial();
         this.status             = GameStatus.IN_PROGRESS;
+        this.vsEngine           = vsEngine;
+        this.playerColor        = playerColor;
     }
 
     // -------------------------------------------------------------------------
@@ -64,6 +79,11 @@ public final class Game {
     public BoardState getCurrentBoardState(){ return currentBoardState; }
     public GameStatus getStatus()           { return status; }
     public boolean isGameOver()             { return status.isTerminal(); }
+    public boolean isVsEngine()             { return vsEngine; }
+    public String getPlayerColor()          { return playerColor; }
+    public String getLastEngineMove()       { return lastEngineMove; }
+
+    public void setLastEngineMove(String move) { this.lastEngineMove = move; }
 
     /** Returns an unmodifiable view of the move history. */
     public List<Move> getMoveHistory() {

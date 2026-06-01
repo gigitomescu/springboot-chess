@@ -10,9 +10,10 @@ spring:
 
 # Stockfish engine configuration
 stockfish:
-  path: C:/stockfish/stockfish.exe
+  path: D:/apps/stockfish/stockfish-windows-x86-64-avx2.exe
   default-depth: 12
   timeout-seconds: 10
+  skill-level: 0   # 0 = weakest (≈1100 ELO), 20 = full strength
 
 # Active frontend: angular | react | none
 frontend:

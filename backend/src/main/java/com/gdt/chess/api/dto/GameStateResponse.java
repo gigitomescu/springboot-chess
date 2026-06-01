@@ -12,5 +12,7 @@ public record GameStateResponse(
         String status,
         List<String> moves,
         int moveCount,
-        String createdAt
+        String createdAt,
+        boolean vsEngine,
+        String playerColor
 ) {}

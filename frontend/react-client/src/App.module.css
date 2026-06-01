@@ -49,6 +49,37 @@
   gap: 12px;
 }
 
+.boardWithBar {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.modeSelector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modeToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.modeSelect {
+  padding: 4px 8px;
+  background: #16213e;
+  border: 1px solid #c9b37f;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 13px;
+}
+
 .statusBar {
   text-align: center;
   font-size: 16px;

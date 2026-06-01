@@ -8,5 +8,7 @@ public record CreateGameResponse(
         String fen,
         String turn,
         String status,
-        String createdAt
+        String createdAt,
+        boolean vsEngine,
+        String playerColor
 ) {}

@@ -3,9 +3,19 @@ import { CreateGameResponse, MakeMoveResponse, GameState } from '../types/chess.
 
 const BASE_URL = '/api/games';
 
+export interface CreateGameOptions {
+  vsEngine?: boolean;
+  playerColor?: 'WHITE' | 'BLACK';
+  engineElo?: number;
+}
+
 /** Creates a new chess game. */
-export async function createGame(): Promise<CreateGameResponse> {
-  const res = await axios.post<CreateGameResponse>(BASE_URL, {});
+export async function createGame(options: CreateGameOptions = {}): Promise<CreateGameResponse> {
+  const res = await axios.post<CreateGameResponse>(BASE_URL, {
+    vsEngine:    options.vsEngine    ?? false,
+    playerColor: options.playerColor ?? 'WHITE',
+    engineElo:   options.engineElo   ?? null,
+  });
   return res.data;
 }
 

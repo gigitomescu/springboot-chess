@@ -72,8 +72,12 @@ public class StockfishEngine implements ChessEngine {
             sendCommand("isready");
             waitFor("readyok");
 
+            sendCommand("setoption name Skill Level value " + properties.getSkillLevel());
+            sendCommand("isready");
+            waitFor("readyok");
+
             available = true;
-            log.info("Stockfish ready.");
+            log.info("Stockfish ready. Skill Level: {}", properties.getSkillLevel());
         } catch (Exception e) {
             log.warn("Stockfish unavailable – engine features disabled. Reason: {}", e.getMessage());
             available = false;
@@ -111,6 +115,22 @@ public class StockfishEngine implements ChessEngine {
             future.cancel(true);
             throw new EngineException("Stockfish analysis timed out after "
                     + properties.getTimeoutSeconds() + "s");
+        } catch (Exception e) {
+            throw new EngineException("Engine error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public synchronized String getBestMove(String fen) {
+        if (!available) {
+            throw new EngineException("Stockfish engine is not available");
+        }
+        Future<String> future = executor.submit(() -> doGetBestMove(fen));
+        try {
+            return future.get(properties.getTimeoutSeconds(), TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            future.cancel(true);
+            throw new EngineException("Stockfish timed out waiting for best move");
         } catch (Exception e) {
             throw new EngineException("Engine error: " + e.getMessage(), e);
         }
@@ -193,6 +213,19 @@ public class StockfishEngine implements ChessEngine {
         }
 
         if (!pv.isEmpty()) builder.principalVariation(pv);
+    }
+
+    private String doGetBestMove(String fen) throws IOException {
+        sendCommand("position fen " + fen);
+        sendCommand("go movetime 500");
+        String line;
+        while ((line = reader.readLine()) != null) {
+            log.debug("Stockfish: {}", line);
+            if (line.startsWith("bestmove")) {
+                return parseBestMove(line);
+            }
+        }
+        throw new EngineException("Stockfish closed stream without bestmove");
     }
 
     private void sendCommand(String command) {

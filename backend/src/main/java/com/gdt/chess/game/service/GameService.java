@@ -1,5 +1,6 @@
 package com.gdt.chess.game.service;
 
+import com.gdt.chess.api.dto.CreateGameRequest;
 import com.gdt.chess.game.model.Game;
 
 /**
@@ -12,11 +13,13 @@ import com.gdt.chess.game.model.Game;
 public interface GameService {
 
     /**
-     * Creates a new game starting from the standard initial position.
+     * Creates a new game.  Pass {@code null} or an empty {@link CreateGameRequest}
+     * for a standard human-vs-human game.  Set {@code vsEngine=true} to play
+     * against Stockfish at the configured skill level.
      *
      * @return the newly created {@link Game}
      */
-    Game createGame();
+    Game createGame(CreateGameRequest request);
 
     /**
      * Retrieves an existing game by its identifier.

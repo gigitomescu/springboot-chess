@@ -1,6 +1,25 @@
 <div class="app-shell">
   <header class="app-header">
     <h1>♟ Chess App</h1>
+
+    <div class="mode-selector">
+      <label class="mode-toggle">
+        <input type="checkbox" [(ngModel)]="vsEngine" />
+        vs Engine
+      </label>
+
+      <ng-container *ngIf="vsEngine">
+        <select class="mode-select" [(ngModel)]="playerColor">
+          <option value="WHITE">Play White</option>
+          <option value="BLACK">Play Black</option>
+        </select>
+
+        <select class="mode-select" [(ngModel)]="engineElo">
+          <option *ngFor="let elo of eloOptions" [value]="elo">{{ elo }} ELO</option>
+        </select>
+      </ng-container>
+    </div>
+
     <div class="header-actions">
       <button class="primary" (click)="newGame()" [disabled]="loading">
         {{ loading ? 'Loading…' : 'New Game' }}
@@ -15,12 +34,20 @@
         {{ statusMessage }}
       </div>
 
-      <app-chess-board
-        [fen]="currentFen"
-        [playerColor]="'WHITE'"
-        [disabled]="boardDisabled || gameStatus !== 'IN_PROGRESS'"
-        (moveMade)="onMoveMade($event)"
-      ></app-chess-board>
+      <div class="board-with-bar">
+        <app-eval-bar
+          [score]="evalScore"
+          [isMate]="evalIsMate"
+          [mateIn]="evalMateIn"
+        ></app-eval-bar>
+
+        <app-chess-board
+          [fen]="currentFen"
+          [playerColor]="myColor"
+          [disabled]="boardDisabled || gameStatus !== 'IN_PROGRESS' || engineThinking"
+          (moveMade)="onMoveMade($event)"
+        ></app-chess-board>
+      </div>
 
       <div *ngIf="errorMessage" class="error-banner">
         {{ errorMessage }}

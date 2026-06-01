@@ -6,6 +6,8 @@ export interface GameState {
   moves: string[];
   moveCount: number;
   createdAt: string;
+  vsEngine: boolean;
+  playerColor: 'WHITE' | 'BLACK' | null;
 }
 
 export interface CreateGameResponse {
@@ -14,6 +16,8 @@ export interface CreateGameResponse {
   turn: 'WHITE' | 'BLACK';
   status: GameStatus;
   createdAt: string;
+  vsEngine: boolean;
+  playerColor: 'WHITE' | 'BLACK' | null;
 }
 
 export interface MakeMoveResponse {
@@ -23,6 +27,13 @@ export interface MakeMoveResponse {
   turn: 'WHITE' | 'BLACK';
   status: GameStatus;
   gameOver: boolean;
+  engineMove: string | null;
+}
+
+export interface CreateGameRequest {
+  vsEngine?: boolean;
+  playerColor?: 'WHITE' | 'BLACK';
+  engineElo?: number | null;
 }
 
 export type GameStatus =

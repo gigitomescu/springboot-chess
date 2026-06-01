@@ -52,7 +52,7 @@ public class GameController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateGameResponse createGame(@RequestBody(required = false) CreateGameRequest request) {
-        Game game = gameService.createGame();
+        Game game = gameService.createGame(request);
         return gameMapper.toCreateGameResponse(game);
     }
 
