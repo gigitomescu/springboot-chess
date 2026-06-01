@@ -1,7 +1,5 @@
 package com.gdt.chess.api;
 
-import com.gdt.chess.api.dto.CreateGameResponse;
-import com.gdt.chess.api.dto.MakeMoveResponse;
 import com.gdt.chess.api.controller.GameController;
 import com.gdt.chess.common.exception.GameNotFoundException;
 import com.gdt.chess.common.exception.GlobalExceptionHandler;

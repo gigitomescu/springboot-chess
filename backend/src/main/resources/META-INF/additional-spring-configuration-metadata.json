@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "frontend.active",
+      "type": "java.lang.String",
+      "description": "Active frontend to serve from the backend. Values: angular, react, none.",
+      "defaultValue": "none"
+    },
+    {
+      "name": "frontend.cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "Comma-separated list of allowed CORS origins for frontend clients.",
+      "defaultValue": "http://localhost:4200,http://localhost:3000"
+    }
+  ]
+}
