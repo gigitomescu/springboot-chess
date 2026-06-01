@@ -2,7 +2,7 @@
 
 The analysis module orchestrates position evaluation by bridging the HTTP/WebSocket layer with the chess engine.
 
-## Package: `com.example.chess.analysis`
+## Package: `com.gdt.chess.analysis`
 
 ---
 

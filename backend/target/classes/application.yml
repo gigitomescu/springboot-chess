@@ -22,5 +22,5 @@ frontend:
 
 logging:
   level:
-    com.example.chess: DEBUG
+    '[com.gdt.chess]': DEBUG
     root: INFO

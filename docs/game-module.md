@@ -2,12 +2,12 @@
 
 The game module is the core domain of the application. It models a chess game's state and enforces business rules around move legality and game termination.
 
-## Package: `com.example.chess.game`
+## Package: `com.gdt.chess.game`
 
 ### Sub-packages
 
 | Package | Contents |
-|---|---|
+| --- | --- |
 | `game.model` | Immutable value objects: `Game`, `Move`, `BoardState`, `PlayerColor`, `GameStatus` |
 | `game.service` | `GameService` interface + `GameServiceImpl`, `BoardService` interface + `ChessLibBoardService` |
 
@@ -20,11 +20,12 @@ The game module is the core domain of the application. It models a chess game's 
 Represents the color of a chess player.
 
 | Value | Description |
-|---|---|
+| --- | --- |
 | `WHITE` | White player |
 | `BLACK` | Black player |
 
 **Methods:**
+
 - `opposite()` — returns the opposing color
 - `fenChar()` — returns `'w'` or `'b'` for use in FEN strings
 
@@ -35,7 +36,7 @@ Represents the color of a chess player.
 Represents the current state of a chess game.
 
 | Value | Terminal? | Description |
-|---|---|---|
+| --- | --- | --- |
 | `IN_PROGRESS` | No | Game is ongoing |
 | `CHECKMATE` | Yes | Active player is in checkmate |
 | `STALEMATE` | Yes | Active player has no legal moves but is not in check |
@@ -46,6 +47,7 @@ Represents the current state of a chess game.
 | `TIMEOUT` | Yes | A player ran out of time |
 
 **Methods:**
+
 - `isTerminal()` — returns `true` for all states except `IN_PROGRESS`
 
 ---

@@ -1,6 +1,7 @@
 # Chess Application — Overview
 
 ## Table of Contents
+
 1. [Architecture](#architecture)
 2. [Technology Stack](#technology-stack)
 3. [Project Structure](#project-structure)
@@ -36,6 +37,7 @@ The application follows **Clean Architecture** with strict layer separation:
 ```
 
 ### Design Principles
+
 - **SOLID** — each class has a single responsibility; all collaborators are injected via interfaces
 - **Dependency Inversion** — `ChessEngine`, `BoardService`, `GameService`, `AnalysisService` are interfaces; Spring wires concrete implementations
 - **Anti-Corruption Layer** — `GameMapper` translates domain objects to DTOs so domain types never cross the API boundary
@@ -46,8 +48,8 @@ The application follows **Clean Architecture** with strict layer separation:
 ## Technology Stack
 
 | Layer | Technology |
-|---|---|
-| Backend runtime | Java 21 + Spring Boot 3.2.0 |
+| --- | --- |
+| Backend runtime | Java 21 + Spring Boot 3.4.0 |
 | Chess rules engine | chesslib 1.3.3 (JitPack) |
 | Chess AI engine | Stockfish (UCI protocol, external process) |
 | Real-time communication | Spring WebSocket + STOMP + SockJS |
@@ -60,13 +62,13 @@ The application follows **Clean Architecture** with strict layer separation:
 
 ## Project Structure
 
-```
+```text
 chess2/
 ├── backend/
 │   ├── pom.xml
 │   └── src/
 │       ├── main/
-│       │   ├── java/com/example/chess/
+│       │   ├── java/com/gdt/chess/
 │       │   │   ├── ChessApplication.java
 │       │   │   ├── config/                 # Spring configuration
 │       │   │   ├── engine/                 # Chess engine abstraction
@@ -78,7 +80,7 @@ chess2/
 │       │   └── resources/
 │       │       └── application.yml
 │       └── test/
-│           └── java/com/example/chess/     # Unit tests
+│           └── java/com/gdt/chess/         # Unit tests
 ├── frontend/
 │   ├── angular-client/                     # Angular 17 app
 │   └── react-client/                       # React 18 + Vite app
@@ -92,7 +94,7 @@ chess2/
 ### Prerequisites
 
 | Prerequisite | Minimum Version |
-|---|---|
+| --- | --- |
 | JDK | 21 |
 | Maven | 3.9 |
 | Node.js | 18 |
