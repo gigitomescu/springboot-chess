@@ -54,7 +54,7 @@ class GameControllerTest {
     @DisplayName("POST /api/games returns 201 with gameId and initial FEN")
     void createGame_returns201() throws Exception {
         Game game = new Game("test-id");
-        given(gameService.createGame()).willReturn(game);
+        given(gameService.createGame(any())).willReturn(game);
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
