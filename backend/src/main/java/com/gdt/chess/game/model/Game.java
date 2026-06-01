@@ -41,11 +41,21 @@ public final class Game {
     /** Quality classification of the player's last move; null when unavailable. */
     private volatile MoveClassification playerMoveClassification;
 
+    /**
+     * Stockfish Skill Level (0–20) for this game.
+     * -1 means "use the engine's configured default from application.yml".
+     */
+    private final int engineSkillLevel;
+
     public Game(String id) {
-        this(id, false, null);
+        this(id, false, null, -1);
     }
 
     public Game(String id, boolean vsEngine, String playerColor) {
+        this(id, vsEngine, playerColor, -1);
+    }
+
+    public Game(String id, boolean vsEngine, String playerColor, int engineSkillLevel) {
         Objects.requireNonNull(id, "Game ID cannot be null");
         this.id                 = id;
         this.createdAt          = Instant.now();
@@ -54,6 +64,7 @@ public final class Game {
         this.status             = GameStatus.IN_PROGRESS;
         this.vsEngine           = vsEngine;
         this.playerColor        = playerColor;
+        this.engineSkillLevel   = engineSkillLevel;
     }
 
     // -------------------------------------------------------------------------
@@ -87,6 +98,8 @@ public final class Game {
     public boolean isGameOver()             { return status.isTerminal(); }
     public boolean isVsEngine()             { return vsEngine; }
     public String getPlayerColor()          { return playerColor; }
+    /** Stockfish Skill Level (0–20) for this game, or -1 to use the engine default. */
+    public int getEngineSkillLevel()        { return engineSkillLevel; }
     public String getLastEngineMove()       { return lastEngineMove; }
     public void setLastEngineMove(String move) { this.lastEngineMove = move; }
     public String getPlayerMoveFen()        { return playerMoveFen; }

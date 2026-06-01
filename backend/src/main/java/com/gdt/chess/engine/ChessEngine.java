@@ -36,6 +36,18 @@ public interface ChessEngine {
     String getBestMove(String fen);
 
     /**
+     * Returns the best move at an explicit Skill Level (0–20) rather than the
+     * engine's configured default.  Implementations that do not support
+     * per-call skill levels fall back to {@link #getBestMove(String)}.
+     *
+     * @param fen        FEN string of the position
+     * @param skillLevel Stockfish Skill Level, 0 (≈1100 ELO) to 20 (full strength)
+     */
+    default String getBestMove(String fen, int skillLevel) {
+        return getBestMove(fen);
+    }
+
+    /**
      * Returns {@code true} when the underlying engine process is running and
      * ready to accept commands.
      */

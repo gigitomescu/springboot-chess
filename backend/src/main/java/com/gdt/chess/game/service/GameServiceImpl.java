@@ -43,19 +43,16 @@ public class GameServiceImpl implements GameService {
                     ? request.playerColor().toUpperCase()
                     : "WHITE";
 
-            // Apply the requested ELO as a one-time Skill Level override when provided.
-            // The StockfishEngine was initialised with the YAML default; for per-game
-            // overrides we reconfigure before each getBestMove call isn't possible via
-            // the current synchronised design, so we rely on the YAML skill-level and
-            // just log the requested ELO for information.
-            if (request.engineElo() != null) {
-                int skill = com.gdt.chess.config.StockfishProperties.eloToSkillLevel(request.engineElo());
-                log.info("vs-engine game requested at ELO {} → Skill Level {}", request.engineElo(), skill);
-            }
+        }
+
+        int skillLevel = -1;
+        if (vsEngine && request.engineElo() != null) {
+            skillLevel = com.gdt.chess.config.StockfishProperties.eloToSkillLevel(request.engineElo());
+            log.info("vs-engine game requested at ELO {} → Skill Level {}", request.engineElo(), skillLevel);
         }
 
         String id   = UUID.randomUUID().toString();
-        Game   game = new Game(id, vsEngine, vsEngine ? playerColor : null);
+        Game   game = new Game(id, vsEngine, vsEngine ? playerColor : null, skillLevel);
         gameStore.put(id, game);
         log.info("Created game {} (vsEngine={}, playerColor={})", id, vsEngine, playerColor);
 
@@ -166,7 +163,8 @@ public class GameServiceImpl implements GameService {
 
     private void applyEngineMove(Game game) {
         String fen        = game.getCurrentBoardState().getFen();
-        String engineMove = engine.getBestMove(fen);
+        int    skill      = game.getEngineSkillLevel();
+        String engineMove = (skill >= 0) ? engine.getBestMove(fen, skill) : engine.getBestMove(fen);
         if ("(none)".equals(engineMove)) {
             log.info("Engine returned (none) – no legal moves in position");
             return;

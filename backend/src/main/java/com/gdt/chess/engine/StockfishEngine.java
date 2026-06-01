@@ -137,6 +137,25 @@ public class StockfishEngine implements ChessEngine {
     }
 
     @Override
+    public synchronized String getBestMove(String fen, int skillLevel) {
+        if (!available) {
+            throw new EngineException("Stockfish engine is not available");
+        }
+        Future<String> future = executor.submit(() -> {
+            sendCommand("setoption name Skill Level value " + skillLevel);
+            return doGetBestMove(fen);
+        });
+        try {
+            return future.get(properties.getTimeoutSeconds(), TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            future.cancel(true);
+            throw new EngineException("Stockfish timed out waiting for best move");
+        } catch (Exception e) {
+            throw new EngineException("Engine error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public boolean isAvailable() {
         return available;
     }
