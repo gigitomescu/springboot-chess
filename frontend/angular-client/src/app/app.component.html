@@ -34,7 +34,7 @@
         <h3>Move History</h3>
         <ol class="move-list">
           <li *ngFor="let move of moveHistory; let i = index">
-            <span class="move-number" *ngIf="i % 2 === 0">{{ (i / 2 | number:'1.0-0') + 1 }}.</span>
+            <span class="move-number" *ngIf="i % 2 === 0">{{ i / 2 + 1 }}.</span>
             {{ move }}
           </li>
         </ol>
