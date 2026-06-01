@@ -40,4 +40,20 @@ public interface GameService {
      * @throws com.gdt.chess.common.exception.InvalidMoveException  if the move is illegal
      */
     Game makeMove(String gameId, String uciMove);
+
+    /**
+     * Resigns the game on behalf of the active player.
+     *
+     * @param gameId unique game identifier
+     * @return the updated {@link Game} with status {@code RESIGNED}
+     */
+    Game resign(String gameId);
+
+    /**
+     * Ends the game as a mutual draw agreement.
+     *
+     * @param gameId unique game identifier
+     * @return the updated {@link Game} with status {@code DRAW_AGREEMENT}
+     */
+    Game offerDraw(String gameId);
 }

@@ -133,6 +133,28 @@ public class GameServiceImpl implements GameService {
         return game;
     }
 
+    @Override
+    public Game resign(String gameId) {
+        Game game = getGame(gameId);
+        if (game.isGameOver()) {
+            throw new InvalidMoveException("Game " + gameId + " is already over: " + game.getStatus());
+        }
+        game.forceStatus(GameStatus.RESIGNED);
+        log.info("Game {} – player resigned", gameId);
+        return game;
+    }
+
+    @Override
+    public Game offerDraw(String gameId) {
+        Game game = getGame(gameId);
+        if (game.isGameOver()) {
+            throw new InvalidMoveException("Game " + gameId + " is already over: " + game.getStatus());
+        }
+        game.forceStatus(GameStatus.DRAW_AGREEMENT);
+        log.info("Game {} – draw agreement", gameId);
+        return game;
+    }
+
     // -------------------------------------------------------------------------
     // Internal helpers
     // -------------------------------------------------------------------------

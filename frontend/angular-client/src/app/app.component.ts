@@ -6,6 +6,7 @@ import { AnalysisPanelComponent } from './components/analysis-panel/analysis-pan
 import { EvalBarComponent } from './components/eval-bar/eval-bar.component';
 import { AnalysisService } from './services/analysis.service';
 import { GameService } from './services/game.service';
+import { SoundService } from './services/sound.service';
 import { GameStatus } from './models/game.model';
 
 const ELO_OPTIONS = [300, 600, 800, 1000, 1200, 1500, 1800, 2000, 2500];
@@ -45,7 +46,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private gameService:     GameService,
-    private analysisService: AnalysisService
+    private analysisService: AnalysisService,
+    private soundService:    SoundService
   ) {}
 
   ngOnInit(): void {
@@ -88,14 +90,23 @@ export class AppComponent implements OnInit {
     this.errorMessage = null;
     this.engineThinking = this.isVsEngineGame;
     this.boardDisabled  = true;
+    const fenBefore = this.currentFen;
 
     this.gameService.makeMove(this.gameId, uciMove).subscribe({
       next: res => {
+        // Play sound for the player's move
+        const playerFen = (res as any).playerMoveFen ?? res.fen;
+        this.soundService.play(this.soundService.wasCapture(fenBefore, playerFen) ? 'capture' : 'move');
         this.currentFen  = res.fen;
         this.currentTurn = res.turn;
         this.gameStatus  = res.status;
         this.moveHistory.push(uciMove);
-        if (res.engineMove) this.moveHistory.push(res.engineMove);
+        if (res.engineMove) {
+          // Play engine response sound
+          this.soundService.play(this.soundService.wasCapture(playerFen, res.fen) ? 'capture' : 'move');
+          this.moveHistory.push(res.engineMove);
+        }
+        if (res.gameOver) this.soundService.play('gameOver');
         this.engineThinking = false;
         this.boardDisabled  = res.gameOver || (this.isVsEngineGame && res.turn !== this.myColor);
         this.refreshEval(res.fen);
@@ -105,6 +116,32 @@ export class AppComponent implements OnInit {
         this.engineThinking = false;
         this.boardDisabled  = false;
       }
+    });
+  }
+
+  resign(): void {
+    if (!this.gameId || this.gameStatus !== 'IN_PROGRESS') return;
+    if (!confirm('Are you sure you want to resign?')) return;
+    this.gameService.resign(this.gameId).subscribe({
+      next: res => {
+        this.gameStatus    = res.status;
+        this.boardDisabled = true;
+        this.soundService.play('gameOver');
+      },
+      error: err => { this.errorMessage = err.error?.detail ?? 'Could not resign'; }
+    });
+  }
+
+  offerDraw(): void {
+    if (!this.gameId || this.gameStatus !== 'IN_PROGRESS') return;
+    if (!confirm('Offer a draw and end the game?')) return;
+    this.gameService.offerDraw(this.gameId).subscribe({
+      next: res => {
+        this.gameStatus    = res.status;
+        this.boardDisabled = true;
+        this.soundService.play('gameOver');
+      },
+      error: err => { this.errorMessage = err.error?.detail ?? 'Could not offer draw'; }
     });
   }
 

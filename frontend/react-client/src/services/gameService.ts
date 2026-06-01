@@ -30,3 +30,15 @@ export async function makeMove(gameId: string, uciMove: string): Promise<MakeMov
   const res = await axios.post<MakeMoveResponse>(`${BASE_URL}/${gameId}/moves`, { move: uciMove });
   return res.data;
 }
+
+/** Resigns the current player, ending the game immediately. */
+export async function resign(gameId: string): Promise<GameState> {
+  const res = await axios.post<GameState>(`${BASE_URL}/${gameId}/resign`);
+  return res.data;
+}
+
+/** Accepts a draw, ending the game as a draw agreement. */
+export async function offerDraw(gameId: string): Promise<GameState> {
+  const res = await axios.post<GameState>(`${BASE_URL}/${gameId}/draw`);
+  return res.data;
+}

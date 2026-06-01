@@ -87,6 +87,14 @@ public final class Game {
         status            = newStatus;
     }
 
+    /**
+     * Forces the game into a terminal status (resign / draw agreement) without
+     * adding a move to the history.
+     */
+    public synchronized void forceStatus(GameStatus newStatus) {
+        this.status = newStatus;
+    }
+
     // -------------------------------------------------------------------------
     // Read accessors
     // -------------------------------------------------------------------------

@@ -52,6 +52,11 @@
       <div *ngIf="errorMessage" class="error-banner">
         {{ errorMessage }}
       </div>
+
+      <div *ngIf="gameStatus === 'IN_PROGRESS' && !engineThinking" class="game-actions">
+        <button class="btn-draw" (click)="offerDraw()">½ Offer Draw</button>
+        <button class="btn-resign" (click)="resign()">⚑ Resign</button>
+      </div>
     </section>
 
     <!-- Side panel -->

@@ -4,9 +4,10 @@ import ChessBoard from './components/ChessBoard';
 import AnalysisPanel from './components/AnalysisPanel';
 import EvalBar from './components/EvalBar';
 import GameClock from './components/GameClock';
-import { createGame, makeMove } from './services/gameService';
+import { createGame, makeMove, resign, offerDraw } from './services/gameService';
 import { analyzeRest } from './services/analysisService';
 import { GameStatus, MakeMoveResponse } from './types/chess.types';
+import { useChessSound, wasCapture } from './hooks/useChessSound';
 
 const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const ELO_OPTIONS = [300, 600, 800, 1000, 1200, 1500, 1800, 2000, 2500];
@@ -53,6 +54,8 @@ function App() {
   const [timeBlack, setTimeBlack]     = useState(0);
   const [flagged, setFlagged]         = useState<'WHITE' | 'BLACK' | null>(null);
   const clockRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const playSound = useChessSound();
 
   // Start / stop the clock whenever turn or game status changes.
   // While the engine is "thinking" (frontend delay), tick the engine's clock
@@ -124,6 +127,7 @@ function App() {
     if (isVsEngineGame && turn !== myColor) return;
     setError(null);
     setEngineThinking(isVsEngineGame);
+    const fenBeforeMove = fen;
     try {
       const res: MakeMoveResponse = await makeMove(gameId, uciMove);
 
@@ -134,6 +138,8 @@ function App() {
         setClassificationSquare(null);
         if (res.playerMoveFen) setFen(res.playerMoveFen);
         setMoveHistory(prev => [...prev, uciMove]);
+        // Play sound for the player's move
+        playSound(wasCapture(fenBeforeMove, res.playerMoveFen ?? res.fen) ? 'capture' : 'move');
         // Show the classification badge right away (player sees it during engine "think")
         if (res.moveClassification) {
           setClassificationSquare(uciMove.slice(2, 4));
@@ -152,6 +158,9 @@ function App() {
         setStatus(res.status);
         setLastEngineMove(res.engineMove);
         setMoveHistory(prev => [...prev, res.engineMove!]);
+        // Play engine move sound
+        playSound(wasCapture(res.playerMoveFen ?? fenBeforeMove, res.fen) ? 'capture' : 'move');
+        if (res.status !== 'IN_PROGRESS') playSound('gameOver');
       } else {
         // Human vs human or engine unavailable
         setLastEngineMove(null);
@@ -161,6 +170,8 @@ function App() {
         setTurn(res.turn);
         setStatus(res.status);
         setMoveHistory(prev => [...prev, uciMove]);
+        playSound(wasCapture(fenBeforeMove, res.fen) ? 'capture' : 'move');
+        if (res.status !== 'IN_PROGRESS') playSound('gameOver');
       }
 
       refreshEval(res.fen);
@@ -175,6 +186,26 @@ function App() {
 
   const boardDisabled = status !== 'IN_PROGRESS' || engineThinking || !!flagged
     || (isVsEngineGame && turn !== myColor);
+
+  const handleResign = useCallback(async () => {
+    if (!gameId || status !== 'IN_PROGRESS') return;
+    if (!window.confirm('Are you sure you want to resign?')) return;
+    try {
+      const res = await resign(gameId);
+      setStatus(res.status);
+      playSound('gameOver');
+    } catch { /* ignore */ }
+  }, [gameId, status, playSound]);
+
+  const handleDraw = useCallback(async () => {
+    if (!gameId || status !== 'IN_PROGRESS') return;
+    if (!window.confirm('Offer a draw and end the game?')) return;
+    try {
+      const res = await offerDraw(gameId);
+      setStatus(res.status);
+      playSound('gameOver');
+    } catch { /* ignore */ }
+  }, [gameId, status, playSound]);
 
   const statusMessage = (): string => {
     if (flagged)         return `${flagged === 'WHITE' ? 'White' : 'Black'} ran out of time!`;
@@ -272,6 +303,17 @@ function App() {
           )}
 
           {error && <div className={styles.errorBanner}>{error}</div>}
+
+          {status === 'IN_PROGRESS' && !flagged && (
+            <div className={styles.gameActions}>
+              <button className={styles.drawBtn} onClick={handleDraw} disabled={engineThinking}>
+                ½ Offer Draw
+              </button>
+              <button className={styles.resignBtn} onClick={handleResign} disabled={engineThinking}>
+                ⚑ Resign
+              </button>
+            </div>
+          )}
         </section>
 
         <aside className={styles.sidePanel}>

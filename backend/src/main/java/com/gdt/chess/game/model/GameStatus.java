@@ -11,6 +11,7 @@ public enum GameStatus {
     DRAW_INSUFFICIENT_MATERIAL,
     DRAW_THREEFOLD_REPETITION,
     RESIGNED,
+    DRAW_AGREEMENT,
     TIMEOUT;
 
     /**

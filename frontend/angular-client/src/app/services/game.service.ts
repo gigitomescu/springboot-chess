@@ -20,4 +20,12 @@ export class GameService {
   makeMove(gameId: string, uciMove: string): Observable<MakeMoveResponse> {
     return this.http.post<MakeMoveResponse>(`${this.baseUrl}/${gameId}/moves`, { move: uciMove });
   }
+
+  resign(gameId: string): Observable<GameState> {
+    return this.http.post<GameState>(`${this.baseUrl}/${gameId}/resign`, {});
+  }
+
+  offerDraw(gameId: string): Observable<GameState> {
+    return this.http.post<GameState>(`${this.baseUrl}/${gameId}/draw`, {});
+  }
 }

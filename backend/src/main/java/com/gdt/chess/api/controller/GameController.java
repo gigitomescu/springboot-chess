@@ -82,4 +82,18 @@ public class GameController {
         Game game = gameService.getGame(gameId);
         return gameMapper.toGameStateResponse(game);
     }
+
+    /** Resigns the current player, ending the game immediately. */
+    @PostMapping("/{gameId}/resign")
+    public GameStateResponse resign(@PathVariable String gameId) {
+        Game game = gameService.resign(gameId);
+        return gameMapper.toGameStateResponse(game);
+    }
+
+    /** Accepts a draw offer, ending the game as a draw agreement. */
+    @PostMapping("/{gameId}/draw")
+    public GameStateResponse offerDraw(@PathVariable String gameId) {
+        Game game = gameService.offerDraw(gameId);
+        return gameMapper.toGameStateResponse(game);
+    }
 }

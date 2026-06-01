@@ -147,3 +147,42 @@
   opacity: 0.5;
   margin-right: 2px;
 }
+
+/* ---- In-game action buttons (Offer Draw / Resign) ---- */
+.gameActions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.drawBtn,
+.resignBtn {
+  padding: 7px 18px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, filter 0.15s;
+}
+
+.drawBtn {
+  background: #4a7c59;
+  color: #fff;
+}
+
+.resignBtn {
+  background: #7c3a3a;
+  color: #fff;
+}
+
+.drawBtn:hover,
+.resignBtn:hover {
+  filter: brightness(1.2);
+}
+
+.drawBtn:disabled,
+.resignBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
