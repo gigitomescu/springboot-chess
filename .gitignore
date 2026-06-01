@@ -1,0 +1,30 @@
+# ── Maven ──────────────────────────────────────────────
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ── Node / Frontend ────────────────────────────────────
+node_modules/
+dist/
+.angular/
+
+# ── IDE ────────────────────────────────────────────────
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+# ── OS ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ───────────────────────────────────────────────
+*.log
+logs/
+
+# ── Spring Boot packaged jars ──────────────────────────
+*.jar
+*.war
+*.ear
