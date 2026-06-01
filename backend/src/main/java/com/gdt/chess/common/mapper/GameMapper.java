@@ -60,7 +60,8 @@ public class GameMapper {
                 game.getCurrentBoardState().getCurrentTurn().name(),
                 game.getStatus().name(),
                 game.isGameOver(),
-                game.getLastEngineMove()
+                game.getLastEngineMove(),
+                game.getPlayerMoveFen()
         );
     }
 

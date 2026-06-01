@@ -35,6 +35,9 @@ public final class Game {
     /** The last move made by the engine (set after each engine reply; {@code null} otherwise). */
     private volatile String lastEngineMove;
 
+    /** FEN after the player's move, before the engine replied (null for human vs human). */
+    private volatile String playerMoveFen;
+
     public Game(String id) {
         this(id, false, null);
     }
@@ -82,8 +85,9 @@ public final class Game {
     public boolean isVsEngine()             { return vsEngine; }
     public String getPlayerColor()          { return playerColor; }
     public String getLastEngineMove()       { return lastEngineMove; }
-
     public void setLastEngineMove(String move) { this.lastEngineMove = move; }
+    public String getPlayerMoveFen()        { return playerMoveFen; }
+    public void setPlayerMoveFen(String fen){ this.playerMoveFen = fen; }
 
     /** Returns an unmodifiable view of the move history. */
     public List<Move> getMoveHistory() {

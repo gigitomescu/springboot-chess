@@ -6,6 +6,8 @@ interface ChessBoardProps {
   fen: string;
   disabled?: boolean;
   playerColor?: 'WHITE' | 'BLACK';
+  /** UCI move to highlight (e.g. "e7e5") — used to show the last engine move */
+  lastMove?: string | null;
   onMove: (uciMove: string) => void;
 }
 
@@ -34,7 +36,7 @@ function parseFen(fen: string): Board {
  * Interactive chess board component.
  * Renders the position from a FEN string and emits UCI moves on user interaction.
  */
-const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, playerColor, onMove }) => {
+const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, playerColor, lastMove, onMove }) => {
   const [board, setBoard]               = useState<Board>([]);
   const [selected, setSelected]         = useState<string | null>(null);
 
@@ -92,6 +94,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, playerCo
             const piece = board[RANKS.indexOf(rank)]?.[FILES.indexOf(file)];
             const light = isLight(rankIdx, fileIdx);
             const sel   = selected === sq;
+            const lastMoveHighlight = lastMove
+              ? sq === lastMove.slice(0, 2) || sq === lastMove.slice(2, 4)
+              : false;
 
             return (
               <div
@@ -99,7 +104,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, playerCo
                 className={[
                   styles.square,
                   light ? styles.light : styles.dark,
-                  sel   ? styles.selected : '',
+                  sel              ? styles.selected      : '',
+                  lastMoveHighlight ? styles.lastMove      : '',
                 ].join(' ')}
                 onClick={() => handleSquareClick(rankIdx, fileIdx)}
                 data-square={sq}

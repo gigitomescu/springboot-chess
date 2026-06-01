@@ -26,6 +26,8 @@ export interface MakeMoveResponse {
   status: GameStatus;
   gameOver: boolean;
   engineMove: string | null;
+  /** FEN after the player's move but before the engine replied; null in human vs human. */
+  playerMoveFen: string | null;
 }
 
 export interface GameState {

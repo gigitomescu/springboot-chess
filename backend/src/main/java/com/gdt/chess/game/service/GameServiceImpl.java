@@ -90,11 +90,13 @@ public class GameServiceImpl implements GameService {
         GameStatus newStatus = boardService.determineStatus(newFen);
 
         game.setLastEngineMove(null);
+        game.setPlayerMoveFen(null);
         game.applyMove(new Move(normalised, currentFen), new BoardState(newFen), newStatus);
         log.info("Game {} – move {} applied, status: {}", gameId, normalised, newStatus);
 
         // After the player's move, let the engine reply if this is a vs-engine game.
         if (game.isVsEngine() && !game.isGameOver() && engine.isAvailable()) {
+            game.setPlayerMoveFen(newFen);   // capture state before engine moves
             applyEngineMove(game);
         }
 

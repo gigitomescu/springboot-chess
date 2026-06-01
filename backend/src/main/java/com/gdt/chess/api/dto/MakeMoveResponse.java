@@ -14,5 +14,7 @@ public record MakeMoveResponse(
         String turn,
         String status,
         boolean gameOver,
-        String engineMove
+        String engineMove,
+        /** FEN after the player's move but before the engine replied; null in human vs human. */
+        String playerMoveFen
 ) {}

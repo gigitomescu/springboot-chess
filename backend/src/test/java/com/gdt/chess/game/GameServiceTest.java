@@ -2,6 +2,7 @@ package com.gdt.chess.game;
 
 import com.gdt.chess.common.exception.GameNotFoundException;
 import com.gdt.chess.common.exception.InvalidMoveException;
+import com.gdt.chess.engine.ChessEngine;
 import com.gdt.chess.game.model.Game;
 import com.gdt.chess.game.model.GameStatus;
 import com.gdt.chess.game.service.BoardService;
@@ -37,11 +38,14 @@ class GameServiceTest {
     @Mock
     private BoardService boardService;
 
+    @Mock
+    private ChessEngine engine;
+
     private GameService gameService;
 
     @BeforeEach
     void setUp() {
-        gameService = new GameServiceImpl(boardService);
+        gameService = new GameServiceImpl(boardService, engine);
     }
 
     // -------------------------------------------------------------------------
@@ -51,7 +55,7 @@ class GameServiceTest {
     @Test
     @DisplayName("createGame returns a game with initial FEN and IN_PROGRESS status")
     void createGame_returnsInitialState() {
-        Game game = gameService.createGame();
+        Game game = gameService.createGame(null);
 
         assertThat(game).isNotNull();
         assertThat(game.getId()).isNotBlank();
@@ -63,8 +67,8 @@ class GameServiceTest {
     @Test
     @DisplayName("createGame generates unique IDs")
     void createGame_uniqueIds() {
-        String id1 = gameService.createGame().getId();
-        String id2 = gameService.createGame().getId();
+        String id1 = gameService.createGame(null).getId();
+        String id2 = gameService.createGame(null).getId();
         assertThat(id1).isNotEqualTo(id2);
     }
 
@@ -75,7 +79,7 @@ class GameServiceTest {
     @Test
     @DisplayName("getGame returns the game for a known ID")
     void getGame_returnsExistingGame() {
-        Game created = gameService.createGame();
+        Game created = gameService.createGame(null);
         Game retrieved = gameService.getGame(created.getId());
         assertThat(retrieved.getId()).isEqualTo(created.getId());
     }
@@ -95,7 +99,7 @@ class GameServiceTest {
     @Test
     @DisplayName("makeMove applies a legal move and updates board state")
     void makeMove_legalMove_updatesGame() {
-        Game game = gameService.createGame();
+        Game game = gameService.createGame(null);
         String gameId = game.getId();
 
         given(boardService.isMoveLegal(INITIAL_FEN, "e2e4")).willReturn(true);
@@ -112,7 +116,7 @@ class GameServiceTest {
     @Test
     @DisplayName("makeMove throws InvalidMoveException for illegal move")
     void makeMove_illegalMove_throwsException() {
-        Game game = gameService.createGame();
+        Game game = gameService.createGame(null);
 
         given(boardService.isMoveLegal(anyString(), eq("e2e5"))).willReturn(false);
 
@@ -123,7 +127,7 @@ class GameServiceTest {
     @Test
     @DisplayName("makeMove throws InvalidMoveException when game is already over")
     void makeMove_gameOver_throwsException() {
-        Game game = gameService.createGame();
+        Game game = gameService.createGame(null);
         String gameId = game.getId();
 
         // Simulate a completed game
@@ -141,7 +145,7 @@ class GameServiceTest {
     @Test
     @DisplayName("makeMove detects CHECKMATE status")
     void makeMove_detectsCheckmate() {
-        Game game = gameService.createGame();
+        Game game = gameService.createGame(null);
 
         given(boardService.isMoveLegal(anyString(), anyString())).willReturn(true);
         given(boardService.applyMove(anyString(), anyString())).willReturn(AFTER_E2E4_FEN);

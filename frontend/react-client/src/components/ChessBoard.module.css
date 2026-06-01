@@ -28,6 +28,11 @@
   outline-offset: -3px;
 }
 
+/* Highlight the from/to squares of the last engine move */
+.lastMove {
+  background-color: rgba(0, 160, 80, 0.45) !important;
+}
+
 .piece {
   font-size: 44px;
   line-height: 1;
