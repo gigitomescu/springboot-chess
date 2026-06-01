@@ -7,7 +7,11 @@
         [class.light]="isLight(rankIdx, fileIdx)"
         [class.dark]="!isLight(rankIdx, fileIdx)"
         [class.selected]="isSelected(rankIdx, fileIdx)"
+        [class.drag-over]="isDragOver(rankIdx, fileIdx)"
         (click)="onSquareClick(rankIdx, fileIdx)"
+        (dragover)="onDragOver(rankIdx, fileIdx, $event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop(rankIdx, fileIdx, $event)"
         [attr.data-square]="squareName(rankIdx, fileIdx)"
       >
         <!-- Rank label on the left edge -->
@@ -21,6 +25,9 @@
           class="piece"
           [class.white-piece]="piece === piece.toUpperCase()"
           [class.black-piece]="piece !== piece.toUpperCase()"
+          [draggable]="canDrag(rankIdx, fileIdx)"
+          (dragstart)="onDragStart(rankIdx, fileIdx, $event)"
+          (dragend)="onDragEnd()"
         >
           {{ pieceSymbols[piece] }}
         </span>

@@ -38,7 +38,15 @@
   font-size: 52px;
   line-height: 1;
   user-select: none;
-  cursor: pointer;
+  cursor: grab;
+}
+
+.piece:active {
+  cursor: grabbing;
+}
+
+.drag-over {
+  background-color: rgba(100, 200, 100, 0.55) !important;
 }
 
 .white-piece { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }

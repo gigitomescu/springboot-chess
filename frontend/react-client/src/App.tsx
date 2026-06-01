@@ -38,6 +38,10 @@ function App() {
   const [myColor, setMyColor]                 = useState<'WHITE' | 'BLACK'>('WHITE');
   const [lastEngineMove, setLastEngineMove]   = useState<string | null>(null);
 
+  // move classification badge (player's last move)
+  const [moveClassification, setMoveClassification] = useState<string | null>(null);
+  const [classificationSquare, setClassificationSquare] = useState<string | null>(null);
+
   // evaluation bar
   const [evalScore, setEvalScore]   = useState(0);
   const [evalIsMate, setEvalIsMate] = useState(false);
@@ -50,13 +54,18 @@ function App() {
   const [flagged, setFlagged]         = useState<'WHITE' | 'BLACK' | null>(null);
   const clockRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Start / stop the clock whenever turn or game status changes
+  // Start / stop the clock whenever turn or game status changes.
+  // While the engine is "thinking" (frontend delay), tick the engine's clock
+  // instead of the player's — the player already moved.
   useEffect(() => {
     if (clockRef.current) clearInterval(clockRef.current);
-    if (timeControl === 0 || status !== 'IN_PROGRESS' || engineThinking || flagged) return;
+    if (timeControl === 0 || status !== 'IN_PROGRESS' || flagged) return;
+
+    const engineColor = myColor === 'WHITE' ? 'BLACK' : 'WHITE';
+    const tickingColor = engineThinking ? engineColor : turn;
 
     clockRef.current = setInterval(() => {
-      if (turn === 'WHITE') {
+      if (tickingColor === 'WHITE') {
         setTimeWhite(t => {
           if (t <= 1) { clearInterval(clockRef.current!); setFlagged('WHITE'); return 0; }
           return t - 1;
@@ -70,7 +79,7 @@ function App() {
     }, 1000);
 
     return () => { if (clockRef.current) clearInterval(clockRef.current); };
-  }, [turn, status, engineThinking, timeControl, flagged]);
+  }, [turn, status, engineThinking, timeControl, flagged, myColor]);
 
   useEffect(() => { startNewGame(); }, []);
 
@@ -100,6 +109,8 @@ function App() {
       setIsVsEngineGame(game.vsEngine);
       setMyColor(game.playerColor ?? 'WHITE');
       setLastEngineMove(null);
+      setMoveClassification(null);
+      setClassificationSquare(null);
       refreshEval(game.fen);
     } catch {
       setError('Failed to create game.');
@@ -116,15 +127,24 @@ function App() {
     try {
       const res: MakeMoveResponse = await makeMove(gameId, uciMove);
 
-      if (res.engineMove && res.playerMoveFen) {
-        // Phase 1: show the player's move immediately, clear last engine move highlight
+      if (res.engineMove) {
+        // Phase 1: show the player's move immediately, clear last engine highlight
         setLastEngineMove(null);
-        setFen(res.playerMoveFen);
+        setMoveClassification(null);
+        setClassificationSquare(null);
+        if (res.playerMoveFen) setFen(res.playerMoveFen);
         setMoveHistory(prev => [...prev, uciMove]);
+        // Show the classification badge right away (player sees it during engine "think")
+        if (res.moveClassification) {
+          setClassificationSquare(uciMove.slice(2, 4));
+          setMoveClassification(res.moveClassification);
+        }
 
-        // Phase 2: after an ELO-scaled delay, show the engine's reply
-        // Lower ELO = faster opponent; higher ELO = more "thinking" time shown
-        const delay = Math.max(600, Math.min(4000, engineElo * 1.5));
+        // Phase 2: ELO-scaled delay before the engine move appears on the board.
+        // Lower ELO = slightly faster (bad move was easy to find); still at least 2s.
+        // Formula: 2000ms at 300 ELO, scaling up to 4500ms at 2500 ELO.
+        const baseDelay = Math.max(2000, Math.min(4500, 2000 + engineElo));
+        const delay = baseDelay + Math.random() * 400; // ±400ms natural variation
         await new Promise(resolve => setTimeout(resolve, delay));
 
         setFen(res.fen);
@@ -133,8 +153,10 @@ function App() {
         setLastEngineMove(res.engineMove);
         setMoveHistory(prev => [...prev, res.engineMove!]);
       } else {
-        // Human vs human or engine didn't reply (game over on player's move)
+        // Human vs human or engine unavailable
         setLastEngineMove(null);
+        setMoveClassification(null);
+        setClassificationSquare(null);
         setFen(res.fen);
         setTurn(res.turn);
         setStatus(res.status);
@@ -231,6 +253,8 @@ function App() {
               disabled={boardDisabled}
               playerColor={isVsEngineGame ? myColor : undefined}
               lastMove={lastEngineMove}
+              moveClassification={moveClassification}
+              classificationSquare={classificationSquare}
               onMove={handleMove}
             />
           </div>

@@ -33,11 +33,46 @@
   background-color: rgba(0, 160, 80, 0.45) !important;
 }
 
+/* ---- Move-quality badge (bottom-right corner of destination square) ---- */
+.moveBadge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.badgeBrilliant  { background-color: #1baca6; }   /* teal  !! */
+.badgeExcellent  { background-color: #5c8a3c; }   /* green ✓  */
+.badgeGood       { background-color: #7ab648; }   /* lime  !  */
+.badgeInaccuracy { background-color: #e6a817; }   /* amber ?! */
+.badgeMistake    { background-color: #e07030; }   /* orange ? */
+.badgeBlunder    { background-color: #cc3030; }   /* red   ?? */
+
 .piece {
   font-size: 44px;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-  cursor: pointer;
+  cursor: grab;
+}
+
+.piece:active {
+  cursor: grabbing;
+}
+
+.dragOver {
+  background-color: rgba(100, 200, 100, 0.55) !important;
 }
 
 .whitePiece { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }

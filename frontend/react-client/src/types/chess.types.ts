@@ -28,6 +28,8 @@ export interface MakeMoveResponse {
   engineMove: string | null;
   /** FEN after the player's move but before the engine replied; null in human vs human. */
   playerMoveFen: string | null;
+  /** Quality of the player's move; null when engine is unavailable. */
+  moveClassification: 'BRILLIANT' | 'EXCELLENT' | 'GOOD' | 'INACCURACY' | 'MISTAKE' | 'BLUNDER' | null;
 }
 
 export interface GameState {

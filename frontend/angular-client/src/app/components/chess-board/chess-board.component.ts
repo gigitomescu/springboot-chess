@@ -25,6 +25,8 @@ export class ChessBoardComponent implements OnChanges {
 
   board: Board = [];
   selectedSquare: string | null = null;
+  dragFromSquare: string | null = null;
+  dragOverSquare: string | null = null;
   files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
   ranks = [8, 7, 6, 5, 4, 3, 2, 1];
 
@@ -59,6 +61,59 @@ export class ChessBoardComponent implements OnChanges {
 
   isSelected(rankIdx: number, fileIdx: number): boolean {
     return this.selectedSquare === this.squareName(rankIdx, fileIdx);
+  }
+
+  isDragOver(rankIdx: number, fileIdx: number): boolean {
+    return this.dragOverSquare === this.squareName(rankIdx, fileIdx);
+  }
+
+  /** Returns own piece on the square or null (respects playerColor restriction). */
+  private getOwnPiece(rankIdx: number, fileIdx: number): string | null {
+    const piece = this.getPiece(rankIdx, fileIdx);
+    if (!piece) return null;
+    const isWhitePiece = piece === piece.toUpperCase();
+    if (this.playerColor === 'WHITE' && !isWhitePiece) return null;
+    if (this.playerColor === 'BLACK' &&  isWhitePiece) return null;
+    return piece;
+  }
+
+  canDrag(rankIdx: number, fileIdx: number): boolean {
+    return !this.disabled && !!this.getOwnPiece(rankIdx, fileIdx);
+  }
+
+  onDragStart(rankIdx: number, fileIdx: number, event: DragEvent): void {
+    if (!this.canDrag(rankIdx, fileIdx)) { event.preventDefault(); return; }
+    const square = this.squareName(rankIdx, fileIdx);
+    this.dragFromSquare = square;
+    this.selectedSquare = square;
+    event.dataTransfer!.effectAllowed = 'move';
+    event.dataTransfer!.setData('text/plain', square);
+  }
+
+  onDragOver(rankIdx: number, fileIdx: number, event: DragEvent): void {
+    event.preventDefault();
+    event.dataTransfer!.dropEffect = 'move';
+    this.dragOverSquare = this.squareName(rankIdx, fileIdx);
+  }
+
+  onDragLeave(): void {
+    this.dragOverSquare = null;
+  }
+
+  onDrop(rankIdx: number, fileIdx: number, event: DragEvent): void {
+    event.preventDefault();
+    const from = this.dragFromSquare;
+    const to   = this.squareName(rankIdx, fileIdx);
+    if (from && from !== to) this.moveMade.emit(from + to);
+    this.dragFromSquare = null;
+    this.dragOverSquare = null;
+    this.selectedSquare = null;
+  }
+
+  onDragEnd(): void {
+    this.dragFromSquare = null;
+    this.dragOverSquare = null;
+    this.selectedSquare = null;
   }
 
   onSquareClick(rankIdx: number, fileIdx: number): void {

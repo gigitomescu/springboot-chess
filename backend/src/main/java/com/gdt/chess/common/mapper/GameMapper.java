@@ -61,7 +61,8 @@ public class GameMapper {
                 game.getStatus().name(),
                 game.isGameOver(),
                 game.getLastEngineMove(),
-                game.getPlayerMoveFen()
+                game.getPlayerMoveFen(),
+                game.getPlayerMoveClassification()
         );
     }
 

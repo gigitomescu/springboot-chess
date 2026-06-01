@@ -38,6 +38,9 @@ public final class Game {
     /** FEN after the player's move, before the engine replied (null for human vs human). */
     private volatile String playerMoveFen;
 
+    /** Quality classification of the player's last move; null when unavailable. */
+    private volatile MoveClassification playerMoveClassification;
+
     public Game(String id) {
         this(id, false, null);
     }
@@ -88,6 +91,8 @@ public final class Game {
     public void setLastEngineMove(String move) { this.lastEngineMove = move; }
     public String getPlayerMoveFen()        { return playerMoveFen; }
     public void setPlayerMoveFen(String fen){ this.playerMoveFen = fen; }
+    public MoveClassification getPlayerMoveClassification()                           { return playerMoveClassification; }
+    public void setPlayerMoveClassification(MoveClassification c)                     { this.playerMoveClassification = c; }
 
     /** Returns an unmodifiable view of the move history. */
     public List<Move> getMoveHistory() {

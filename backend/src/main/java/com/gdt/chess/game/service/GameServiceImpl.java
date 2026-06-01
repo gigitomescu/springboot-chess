@@ -4,10 +4,12 @@ import com.gdt.chess.api.dto.CreateGameRequest;
 import com.gdt.chess.common.exception.GameNotFoundException;
 import com.gdt.chess.common.exception.InvalidMoveException;
 import com.gdt.chess.engine.ChessEngine;
+import com.gdt.chess.engine.EngineResponse;
 import com.gdt.chess.game.model.BoardState;
 import com.gdt.chess.game.model.Game;
 import com.gdt.chess.game.model.GameStatus;
 import com.gdt.chess.game.model.Move;
+import com.gdt.chess.game.model.MoveClassification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -86,17 +88,48 @@ public class GameServiceImpl implements GameService {
             throw new InvalidMoveException("Illegal move '" + uciMove + "' in position: " + currentFen);
         }
 
+        // ---- Pre-move analysis for move classification ----
+        int    preMoveScore    = 0;
+        String engineBestMove  = null;
+        boolean doClassify     = game.isVsEngine() && engine.isAvailable();
+        if (doClassify) {
+            try {
+                EngineResponse pre = engine.analyze(currentFen, 10);
+                preMoveScore   = scoreOf(pre);
+                engineBestMove = pre.getBestMove();
+            } catch (Exception e) {
+                log.debug("Pre-move analysis skipped: {}", e.getMessage());
+                doClassify = false;
+            }
+        }
+
         String     newFen    = boardService.applyMove(currentFen, normalised);
         GameStatus newStatus = boardService.determineStatus(newFen);
 
+        // ---- Post-move analysis for move classification ----
+        MoveClassification classification = null;
+        if (doClassify) {
+            try {
+                EngineResponse post    = engine.analyze(newFen, 10);
+                int            postScore = scoreOf(post);
+                // Both scores are from the side-to-move's perspective.
+                // After the move the side to move changes, so postScore is the
+                // opponent's score; centipawn loss for the mover = pre + post.
+                int cpLoss = preMoveScore + postScore;
+                classification = classify(normalised, engineBestMove, cpLoss);
+            } catch (Exception e) {
+                log.debug("Post-move analysis skipped: {}", e.getMessage());
+            }
+        }
+
         game.setLastEngineMove(null);
         game.setPlayerMoveFen(null);
+        game.setPlayerMoveClassification(classification);
         game.applyMove(new Move(normalised, currentFen), new BoardState(newFen), newStatus);
-        log.info("Game {} – move {} applied, status: {}", gameId, normalised, newStatus);
+        log.info("Game {} – move {} applied [{}], status: {}", gameId, normalised, classification, newStatus);
 
-        // After the player's move, let the engine reply if this is a vs-engine game.
         if (game.isVsEngine() && !game.isGameOver() && engine.isAvailable()) {
-            game.setPlayerMoveFen(newFen);   // capture state before engine moves
+            game.setPlayerMoveFen(newFen);
             applyEngineMove(game);
         }
 
@@ -106,6 +139,30 @@ public class GameServiceImpl implements GameService {
     // -------------------------------------------------------------------------
     // Internal helpers
     // -------------------------------------------------------------------------
+
+    /** Returns the centipawn score clamped to ±30 000 for mate distances. */
+    private static int scoreOf(EngineResponse r) {
+        if (r.isMate()) return r.getMateIn() > 0 ? 30_000 : -30_000;
+        return r.getScore();
+    }
+
+    /**
+     * Classifies a move by centipawn loss relative to the engine's best choice.
+     *
+     * <p>Centipawn loss is {@code preMoveScore + postMoveScore} where both values
+     * are from the side-to-move's perspective before and after the move
+     * respectively.  A positive value means the position worsened for the mover.</p>
+     */
+    private static MoveClassification classify(String played, String best, int cpLoss) {
+        // Brilliant: played the engine's top choice AND the position is at least
+        // as good as before (no loss, meaning it was a strong/non-obvious best move).
+        if (played.equals(best) && cpLoss <= 0)  return MoveClassification.BRILLIANT;
+        if (cpLoss <= 30)                         return MoveClassification.EXCELLENT;
+        if (cpLoss <= 100)                        return MoveClassification.GOOD;
+        if (cpLoss <= 200)                        return MoveClassification.INACCURACY;
+        if (cpLoss <= 400)                        return MoveClassification.MISTAKE;
+        return MoveClassification.BLUNDER;
+    }
 
     private void applyEngineMove(Game game) {
         String fen        = game.getCurrentBoardState().getFen();
