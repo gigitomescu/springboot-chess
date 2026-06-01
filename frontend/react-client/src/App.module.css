@@ -49,6 +49,11 @@
   gap: 12px;
 }
 
+.clockRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .boardWithBar {
   display: flex;
   flex-direction: row;

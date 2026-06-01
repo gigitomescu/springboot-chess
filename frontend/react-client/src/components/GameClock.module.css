@@ -1,0 +1,47 @@
+.clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #16213e;
+  border: 2px solid #2d2d4e;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.clock.active {
+  border-color: #c9b37f;
+  background: #1a2a50;
+}
+
+.clock.flagged {
+  border-color: #ff4444;
+  background: #3a1e1e;
+}
+
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.time {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #e0e0e0;
+  letter-spacing: 2px;
+}
+
+.clock.active .time {
+  color: #c9b37f;
+}
+
+.clock.flagged .time {
+  color: #ff4444;
+}

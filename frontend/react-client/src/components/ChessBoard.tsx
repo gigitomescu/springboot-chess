@@ -5,6 +5,7 @@ import { Board } from '../types/chess.types';
 interface ChessBoardProps {
   fen: string;
   disabled?: boolean;
+  playerColor?: 'WHITE' | 'BLACK';
   onMove: (uciMove: string) => void;
 }
 
@@ -33,9 +34,14 @@ function parseFen(fen: string): Board {
  * Interactive chess board component.
  * Renders the position from a FEN string and emits UCI moves on user interaction.
  */
-const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, onMove }) => {
+const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, playerColor, onMove }) => {
   const [board, setBoard]               = useState<Board>([]);
   const [selected, setSelected]         = useState<string | null>(null);
+
+  // Flip ranks/files when playing as Black so player's pieces are at the bottom
+  const flipped = playerColor === 'BLACK';
+  const displayRanks = flipped ? [...RANKS].reverse() : RANKS;
+  const displayFiles = flipped ? [...FILES].reverse() : FILES;
 
   useEffect(() => {
     setBoard(parseFen(fen));
@@ -43,19 +49,30 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, onMove }
   }, [fen]);
 
   const squareName = (rankIdx: number, fileIdx: number): string =>
-    `${FILES[fileIdx]}${RANKS[rankIdx]}`;
+    `${displayFiles[fileIdx]}${displayRanks[rankIdx]}`;
 
-  const isLight = (rankIdx: number, fileIdx: number): boolean =>
-    (rankIdx + fileIdx) % 2 === 0;
+  const isLight = (rankIdx: number, fileIdx: number): boolean => {
+    const fileNum = FILES.indexOf(displayFiles[fileIdx]);
+    const rankNum = RANKS.indexOf(displayRanks[rankIdx]);
+    return (rankNum + fileNum) % 2 === 0;
+  };
 
   const handleSquareClick = useCallback((rankIdx: number, fileIdx: number) => {
     if (disabled) return;
 
     const square = squareName(rankIdx, fileIdx);
-    const piece  = board[rankIdx]?.[fileIdx];
+    const piece  = board[RANKS.indexOf(displayRanks[rankIdx])]?.[FILES.indexOf(displayFiles[fileIdx])];
 
     if (!selected) {
-      if (piece) setSelected(square);
+      if (piece) {
+        // When playerColor is set, only allow selecting own pieces
+        if (playerColor) {
+          const isWhitePiece = piece === piece.toUpperCase();
+          if (playerColor === 'WHITE' && !isWhitePiece) return;
+          if (playerColor === 'BLACK' &&  isWhitePiece) return;
+        }
+        setSelected(square);
+      }
     } else {
       if (selected === square) {
         setSelected(null);
@@ -64,15 +81,15 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ fen, disabled = false, onMove }
         setSelected(null);
       }
     }
-  }, [disabled, board, selected, onMove]);
+  }, [disabled, board, selected, onMove, playerColor, displayRanks, displayFiles]);
 
   return (
     <div className={styles.boardContainer}>
       <div className={styles.board}>
-        {RANKS.map((rank, rankIdx) =>
-          FILES.map((file, fileIdx) => {
+        {displayRanks.map((rank, rankIdx) =>
+          displayFiles.map((file, fileIdx) => {
             const sq    = squareName(rankIdx, fileIdx);
-            const piece = board[rankIdx]?.[fileIdx];
+            const piece = board[RANKS.indexOf(rank)]?.[FILES.indexOf(file)];
             const light = isLight(rankIdx, fileIdx);
             const sel   = selected === sq;
 
