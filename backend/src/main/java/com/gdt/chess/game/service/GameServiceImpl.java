@@ -1,6 +1,8 @@
 package com.gdt.chess.game.service;
 
 import com.gdt.chess.api.dto.CreateGameRequest;
+import com.gdt.chess.api.dto.GameAccuracyResponse;
+import com.gdt.chess.api.dto.GameAccuracyResponse.MoveAccuracyDetail;
 import com.gdt.chess.common.exception.GameNotFoundException;
 import com.gdt.chess.common.exception.InvalidMoveException;
 import com.gdt.chess.engine.ChessEngine;
@@ -10,10 +12,13 @@ import com.gdt.chess.game.model.Game;
 import com.gdt.chess.game.model.GameStatus;
 import com.gdt.chess.game.model.Move;
 import com.gdt.chess.game.model.MoveClassification;
+import com.gdt.chess.config.StockfishProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,11 +31,14 @@ public class GameServiceImpl implements GameService {
 
     private final BoardService boardService;
     private final ChessEngine  engine;
+    private final StockfishProperties stockfishProperties;
     private final Map<String, Game> gameStore = new ConcurrentHashMap<>();
 
-    public GameServiceImpl(BoardService boardService, ChessEngine engine) {
-        this.boardService = boardService;
-        this.engine       = engine;
+    public GameServiceImpl(BoardService boardService, ChessEngine engine,
+                           StockfishProperties stockfishProperties) {
+        this.boardService        = boardService;
+        this.engine              = engine;
+        this.stockfishProperties = stockfishProperties;
     }
 
     @Override
@@ -155,6 +163,60 @@ public class GameServiceImpl implements GameService {
         return game;
     }
 
+    @Override
+    public GameAccuracyResponse getAccuracy(String gameId, int depth) {
+        Game game = getGame(gameId);
+        List<Move> moves = game.getMoveHistory();
+
+        if (moves.isEmpty()) {
+            return new GameAccuracyResponse(gameId, -1, -1, List.of());
+        }
+
+        int searchDepth = depth > 0 ? depth : stockfishProperties.getDefaultDepth();
+
+        // Collect engine scores for every position: [pos_0, pos_1, ..., pos_N]
+        // pos_i is the FEN before move i; pos_N is the final board state.
+        List<Integer> scores = new ArrayList<>(moves.size() + 1);
+        for (Move move : moves) {
+            EngineResponse r = engine.analyze(move.getFenBefore(), searchDepth);
+            scores.add(scoreOf(r));
+        }
+        EngineResponse finalR = engine.analyze(game.getCurrentBoardState().getFen(), searchDepth);
+        scores.add(scoreOf(finalR));
+
+        // Build per-move details. White moves on even indices (0, 2, 4, …).
+        List<MoveAccuracyDetail> details = new ArrayList<>(moves.size());
+        double whiteTotalAccuracy = 0;
+        double blackTotalAccuracy = 0;
+        int whiteMoves = 0;
+        int blackMoves = 0;
+
+        for (int i = 0; i < moves.size(); i++) {
+            int    preCp  = scores.get(i);
+            int    postCp = scores.get(i + 1);
+            double acc    = moveAccuracy(preCp, postCp);
+
+            // Determine colour from the FEN active-colour field.
+            String fenBefore = moves.get(i).getFenBefore();
+            boolean isWhite  = fenActiveSide(fenBefore);
+            String  color    = isWhite ? "WHITE" : "BLACK";
+            int     moveNum  = i / 2 + 1;
+
+            details.add(new MoveAccuracyDetail(moveNum, color, moves.get(i).getUci(),
+                    preCp, postCp, acc));
+
+            if (isWhite) { whiteTotalAccuracy += acc; whiteMoves++; }
+            else          { blackTotalAccuracy += acc; blackMoves++; }
+        }
+
+        double whiteAcc = whiteMoves > 0 ? round2(whiteTotalAccuracy / whiteMoves) : -1;
+        double blackAcc = blackMoves > 0 ? round2(blackTotalAccuracy / blackMoves) : -1;
+
+        log.info("Game {} accuracy review – white={} black={} ({} moves at depth {})",
+                gameId, whiteAcc, blackAcc, moves.size(), searchDepth);
+        return new GameAccuracyResponse(gameId, whiteAcc, blackAcc, details);
+    }
+
     // -------------------------------------------------------------------------
     // Internal helpers
     // -------------------------------------------------------------------------
@@ -196,5 +258,38 @@ public class GameServiceImpl implements GameService {
         game.applyMove(new Move(engineMove, fen), new BoardState(newFen), newStatus);
         game.setLastEngineMove(engineMove);
         log.info("Engine played: {}, status: {}", engineMove, newStatus);
+    }
+
+    /**
+     * Computes the accuracy percentage for a single move using the Lichess
+     * win-rate formula.
+     *
+     * <p>{@code preCp} is the engine score from the mover's perspective before
+     * the move; {@code postCp} is the engine score from the opponent's
+     * perspective after the move (i.e. the new side-to-move).</p>
+     */
+    private static double moveAccuracy(int preCp, int postCp) {
+        double wrBefore = winRate(preCp);
+        double wrAfter  = 100.0 - winRate(postCp);  // mover's win rate after the move
+        double wrLoss   = Math.max(0.0, wrBefore - wrAfter);
+        return Math.max(0.0, 103.1668 * Math.exp(-0.04354 * wrLoss) - 3.1669);
+    }
+
+    /** Converts a centipawn score to a win-rate percentage (0–100) using a logistic curve. */
+    private static double winRate(int cp) {
+        return 100.0 / (1.0 + Math.exp(-0.00368208 * cp));
+    }
+
+    /**
+     * Returns {@code true} when it is White's turn in the given FEN string.
+     * White is indicated by the letter {@code 'w'} in the second FEN field.
+     */
+    private static boolean fenActiveSide(String fen) {
+        int space = fen.indexOf(' ');
+        return space >= 0 && space + 1 < fen.length() && fen.charAt(space + 1) == 'w';
+    }
+
+    private static double round2(double v) {
+        return Math.round(v * 100.0) / 100.0;
     }
 }

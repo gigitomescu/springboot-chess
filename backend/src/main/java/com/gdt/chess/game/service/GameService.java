@@ -1,6 +1,7 @@
 package com.gdt.chess.game.service;
 
 import com.gdt.chess.api.dto.CreateGameRequest;
+import com.gdt.chess.api.dto.GameAccuracyResponse;
 import com.gdt.chess.game.model.Game;
 
 /**
@@ -56,4 +57,20 @@ public interface GameService {
      * @return the updated {@link Game} with status {@code DRAW_AGREEMENT}
      */
     Game offerDraw(String gameId);
+
+    /**
+     * Reviews every move in the game with Stockfish and computes per-player
+     * accuracy (0–100 %).
+     *
+     * <p>Accuracy is derived from win-rate loss per move using the same
+     * logistic formula as Lichess.  Requires the engine to be available;
+     * throws {@link com.gdt.chess.common.exception.EngineException} otherwise.</p>
+     *
+     * @param gameId  unique game identifier
+     * @param depth   analysis depth per position; {@code 0} uses the configured default
+     * @return {@link GameAccuracyResponse} with overall and per-move accuracy
+     * @throws com.gdt.chess.common.exception.GameNotFoundException if not found
+     * @throws com.gdt.chess.common.exception.EngineException       if the engine is unavailable
+     */
+    GameAccuracyResponse getAccuracy(String gameId, int depth);
 }

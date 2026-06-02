@@ -2,6 +2,7 @@ package com.gdt.chess.api.controller;
 
 import com.gdt.chess.api.dto.CreateGameRequest;
 import com.gdt.chess.api.dto.CreateGameResponse;
+import com.gdt.chess.api.dto.GameAccuracyResponse;
 import com.gdt.chess.api.dto.GameStateResponse;
 import com.gdt.chess.api.dto.MakeMoveRequest;
 import com.gdt.chess.api.dto.MakeMoveResponse;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -95,5 +97,22 @@ public class GameController {
     public GameStateResponse offerDraw(@PathVariable String gameId) {
         Game game = gameService.offerDraw(gameId);
         return gameMapper.toGameStateResponse(game);
+    }
+
+    /**
+     * Reviews all moves with Stockfish and returns per-player accuracy (0–100 %).
+     *
+     * <p>This call runs Stockfish once per position in the game, so it may
+     * take several seconds for long games.</p>
+     *
+     * @param gameId path variable identifying the game
+     * @param depth  optional analysis depth per position (default: configured engine default)
+     * @return {@link GameAccuracyResponse} with overall and per-move accuracy
+     */
+    @GetMapping("/{gameId}/accuracy")
+    public GameAccuracyResponse getAccuracy(
+            @PathVariable String gameId,
+            @RequestParam(defaultValue = "0") int depth) {
+        return gameService.getAccuracy(gameId, depth);
     }
 }
