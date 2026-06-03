@@ -5,6 +5,7 @@ import com.gdt.chess.common.exception.InvalidMoveException;
 import com.gdt.chess.engine.ChessEngine;
 import com.gdt.chess.game.model.Game;
 import com.gdt.chess.game.model.GameStatus;
+import com.gdt.chess.config.StockfishProperties;
 import com.gdt.chess.game.service.BoardService;
 import com.gdt.chess.game.service.GameService;
 import com.gdt.chess.game.service.GameServiceImpl;
@@ -45,7 +46,9 @@ class GameServiceTest {
 
     @BeforeEach
     void setUp() {
-        gameService = new GameServiceImpl(boardService, engine);
+        StockfishProperties props = new StockfishProperties();
+        props.setDefaultDepth(12);
+        gameService = new GameServiceImpl(boardService, engine, props);
     }
 
     // -------------------------------------------------------------------------
