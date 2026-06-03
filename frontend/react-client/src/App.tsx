@@ -162,14 +162,19 @@ function App() {
         playSound(wasCapture(res.playerMoveFen ?? fenBeforeMove, res.fen) ? 'capture' : 'move');
         if (res.status !== 'IN_PROGRESS') playSound('gameOver');
       } else {
-        // Human vs human or engine unavailable
+        // Human vs human, engine unavailable, or game ended on the player's move
         setLastEngineMove(null);
-        setMoveClassification(null);
-        setClassificationSquare(null);
         setFen(res.fen);
         setTurn(res.turn);
         setStatus(res.status);
         setMoveHistory(prev => [...prev, uciMove]);
+        if (res.moveClassification) {
+          setClassificationSquare(uciMove.slice(2, 4));
+          setMoveClassification(res.moveClassification);
+        } else {
+          setMoveClassification(null);
+          setClassificationSquare(null);
+        }
         playSound(wasCapture(fenBeforeMove, res.fen) ? 'capture' : 'move');
         if (res.status !== 'IN_PROGRESS') playSound('gameOver');
       }
