@@ -96,7 +96,7 @@ public class GameServiceImpl implements GameService {
         // ---- Pre-move analysis for move classification ----
         int    preMoveScore    = 0;
         String engineBestMove  = null;
-        boolean doClassify     = game.isVsEngine() && engine.isAvailable();
+        boolean doClassify     = engine.isAvailable();
         if (doClassify) {
             try {
                 EngineResponse pre = engine.analyze(currentFen, 10);
